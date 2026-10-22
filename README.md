@@ -13,6 +13,10 @@
 | 03 | DeepTutor（HKUDS） | 智能辅导、知识问答与学习代理 | [README](projects/project-03-deeptutor/README.md) | [COURSE](projects/project-03-deeptutor/COURSE.md) |
 | 04 | Intelligence Gathering | 多源采集、内容分析、知识库归档与研究想法生成 | [README](projects/project-04-Intelligence%20Gathering/README.md) | [COURSE](projects/project-04-Intelligence%20Gathering/COURSE.md) |
 
+## 个人研究项目
+
+本 Fork 另收录个人的[多智能体系统安全研究项目](projects/multi-agent-security-research/README.md)，内容包括文献库、阅读笔记、威胁建模、协作安全评测框架与实验记录模板。项目完整保存在 `projects/multi-agent-security-research/` 文件夹中；来源及导入版本见[整合说明](projects/multi-agent-security-research/SOURCE.md)。当前内容为研究资料与文本框架，尚未在原项目中完成复现实验。
+
 ## 目录结构
 
 ```text
@@ -23,7 +27,8 @@ xidian-ai-security-class-project/
     ├── project-01-ai-researcher/
     ├── project-02-ai-scientist-v2/
     ├── project-03-deeptutor/
-    └── project-04-Intelligence Gathering/
+    ├── project-04-Intelligence Gathering/
+    └── multi-agent-security-research/
 ```
 
 每个项目都包含中文使用 README.md 和课程任务 COURSE.md。README 按环境准备、依赖安装、模型配置、启动、首次演示与排错组织；整理前的说明保存在各项目 README.original.md。各自的依赖、示例与原始许可文件保存在对应目录内。
