@@ -61,13 +61,14 @@ def _env_path() -> Path:
 @router.get("/analysis-config")
 async def get_analysis_config():
     configured = os.getenv("AI_MODEL", DEFAULT_MODEL)
+    models = list(AI_MODELS)
     if configured not in {item["value"] for item in AI_MODELS}:
-        configured = DEFAULT_MODEL
-    return {"models": AI_MODELS, "model": configured, "ai_enabled": bool(os.getenv("AI_API_KEY", "").strip()), "themes": available_themes()}
+        models.append({"value": configured, "label": f"已配置模型：{configured}"})
+    return {"models": models, "model": configured, "ai_enabled": bool(os.getenv("AI_API_KEY", "").strip()), "themes": available_themes()}
 
 @router.put("/analysis-config")
 async def update_analysis_config(request: AnalysisConfigRequest):
-    allowed = {item["value"] for item in AI_MODELS}
+    allowed = {item["value"] for item in AI_MODELS} | {os.getenv("AI_MODEL", DEFAULT_MODEL)}
     if request.model not in allowed:
         raise HTTPException(status_code=400, detail="不支持的模型")
     path = _env_path()

@@ -9,10 +9,12 @@ import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 import httpx
 import jieba.analyse
 from dotenv import load_dotenv
+from pipeline.grounding import CLAIM_INSTRUCTION, SOURCE_POLICY, source_record, verify_candidate
 from pipeline.research_intelligence import ingest_analysis
 from pipeline.topic_taxonomy import TOPIC_TAXONOMY, canonical_topic, topic_catalog
 
@@ -98,7 +100,7 @@ def _normalize(row: dict[str, Any]) -> dict[str, Any]:
     description = _first(row, "desc", "content", "text", "title")
     author = _first(row, "nickname", "author", "user_nickname", "creator")
     url = _first(row, "url", "aweme_url", "note_url", "video_url", "source_url")
-    return {
+    normalized = {
         "title": title[:500],
         "text": description[:4000],
         "author": author[:200],
@@ -107,6 +109,9 @@ def _normalize(row: dict[str, Any]) -> dict[str, Any]:
         "published_at": _first(row, "create_time", "publish_time", "time", "date"),
         "raw": row,
     }
+    normalized["source_id"] = source_record(normalized)["source_id"]
+    normalized["source_trust"] = "external-untrusted"
+    return normalized
 
 
 def _keywords(text: str, limit: int = 8) -> list[str]:
@@ -260,26 +265,34 @@ async def _summarize_batch(items: list[dict[str, Any]], batch_number: int) -> di
     api_key = os.getenv("AI_API_KEY", "").strip()
     if not api_key:
         return {}
-    source_items = [
-        {"title": item["title"][:160], "text": item["text"][:360]}
-        for item in items
-    ]
+    source_items = [source_record(item, text_limit=360) for item in items]
     prompt = {
         "batch_number": batch_number,
         "records": source_items,
-        "instruction": "基于这批原始内容返回 JSON：summary(不超过180字), topics(最多6个), claims(最多5条)。仅总结输入中出现的信息，不要补写事实。",
+        "instruction": CLAIM_INSTRUCTION,
     }
+    base_url = os.getenv("AI_BASE_URL", "https://api.openai.com/v1").rstrip("/")
+    request = {"model": os.getenv("AI_MODEL", "gpt-4o-mini"), "temperature": 0.1,
+               "max_tokens": 1600, "response_format": {"type": "json_object"},
+               "messages": [{"role": "system", "content": "你是严谨的资料分析助手。" + SOURCE_POLICY},
+                            {"role": "user", "content": json.dumps(prompt, ensure_ascii=False)}]}
+    if urlsplit(base_url).hostname == "api.deepseek.com":
+        request["thinking"] = {"type": "disabled"}
     try:
         async with httpx.AsyncClient(timeout=httpx.Timeout(35.0, connect=8.0)) as client:
             response = await client.post(
-                f"{os.getenv('AI_BASE_URL', 'https://api.openai.com/v1').rstrip('/')}/chat/completions",
+                f"{base_url}/chat/completions",
                 headers={"Authorization": f"Bearer {api_key}"},
-                json={"model": os.getenv("AI_MODEL", "gpt-4o-mini"), "temperature": 0.1, "response_format": {"type": "json_object"}, "messages": [{"role": "system", "content": "你是严谨的资料分析助手。"}, {"role": "user", "content": json.dumps(prompt, ensure_ascii=False)}]},
+                json=request,
             )
             response.raise_for_status()
-            return json.loads(response.json()["choices"][0]["message"]["content"])
-    except Exception:
-        return {}
+            candidate = json.loads(response.json()["choices"][0]["message"]["content"])
+            return {**verify_candidate(candidate, source_items), "analysis_method": "ai-source-checked"}
+    except (httpx.HTTPError, ValueError, KeyError, IndexError, TypeError) as exc:
+        # Preserve failure visibility without exposing response bodies or credentials.
+        return {"summary": "", "topics": [], "claims": [], "citations": [],
+                "verification": {"status": "model-error", "error_type": type(exc).__name__,
+                                 "accepted": 0, "rejected": 0}}
 
 
 async def _summarize_batches(items: list[dict[str, Any]]) -> list[dict[str, Any]]:

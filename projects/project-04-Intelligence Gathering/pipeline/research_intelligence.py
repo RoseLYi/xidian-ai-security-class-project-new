@@ -417,6 +417,19 @@ def _write_note(path: Path, content: str) -> bool:
     return True
 
 
+def _archive_filename(directory: Path, prefix: str, title: str, identifier: str, *, path_limit: int | None = None) -> str:
+    """Keep stable ID suffixes while fitting Windows' ordinary path budget."""
+    suffix = f"-{identifier[-8:]}.md"
+    limit = path_limit if path_limit is not None else (240 if os.name == "nt" else None)
+    title_limit = 80
+    if limit is not None:
+        parent_length = len(str(directory.resolve()).encode("utf-16-le")) // 2
+        title_limit = min(title_limit, limit - parent_length - 1 - len(prefix) - len(suffix))
+        if title_limit < 8:
+            raise ValueError("知识库路径过长，请配置更短的知识库目录后重新同步。")
+    return f"{prefix}{_slug(title, title_limit)}{suffix}"
+
+
 def _frontmatter(values: dict[str, Any]) -> str:
     lines = ["---"]
     for key, value in values.items():
@@ -553,8 +566,9 @@ def _sync_academic_literature(vault: Path) -> dict[str, Any]:
     for doc in docs:
         topic_dir = _topic_directory(*(doc.get("domains") or []), doc.get("title"))
         platform_dir = _slug(str(doc["platform"]).lower(), 40)
-        filename = f"文献-{_slug(doc['title'], 80)}-{doc['id'][-8:]}.md"
-        written += int(_write_note(target / topic_dir / platform_dir / filename, _document_note(doc, "literature")))
+        directory = target / topic_dir / platform_dir
+        filename = _archive_filename(directory, "文献-", doc["title"], doc["id"])
+        written += int(_write_note(directory / filename, _document_note(doc, "literature")))
     return {"status": "completed", "vault": str(vault), "notes_written": written, "notes_removed": removed, "documents": len(docs), "target": str(target)}
 
 
@@ -616,7 +630,7 @@ def _sync_social_intelligence(vault: Path) -> dict[str, Any]:
     for doc in docs:
         topic_dir = _topic_directory(*(doc.get("domains") or []), doc.get("title"))
         platform_dir = sources_root / topic_dir / _slug(str(doc["platform"]).lower(), 40)
-        filename = f"内容-{_slug(doc['title'], 80)}-{doc['id'][-8:]}.md"
+        filename = _archive_filename(platform_dir, "内容-", doc["title"], doc["id"])
         written += int(_write_note(platform_dir / filename, _document_note(doc, "social-source")))
     for item in evidence:
         topic_dir = _topic_directory(*(item.get("domains") or []), item.get("title"))
@@ -635,7 +649,7 @@ def _sync_social_intelligence(vault: Path) -> dict[str, Any]:
     analysis_runs = _analysis_runs_for_reports()
     for run in analysis_runs:
         topic_dir = _topic_directory(*(topic.get("topic") for topic in run["intelligence"].get("topics") or []), Path(run["source_file"]).stem)
-        filename = f"分析-{run['created_at'][:10]}-{_slug(Path(run['source_file']).stem, 60)}.md"
+        filename = _archive_filename(reports_root / topic_dir, f"分析-{run['created_at'][:10]}-", Path(run['source_file']).stem, run["id"])
         intelligence = run["intelligence"]
         lines = [f"# 内容分析：{Path(run['source_file']).name}", "", "## 本次分析", "", f"- 来源类别：{run['source_category']}", f"- 平台或批次：{run['platform']}", f"- 时间：{run['created_at']}", f"- 原始来源：`{run['source_file']}`", f"- 分析记录：{run['output_count']}", "", "## 主题观察", ""]
         for topic in (intelligence.get("topics") or [])[:10]:
@@ -644,6 +658,13 @@ def _sync_social_intelligence(vault: Path) -> dict[str, Any]:
             lines.extend(["", "## 分批分析摘要", ""])
             for summary in run["batch_summaries"]:
                 lines.extend([f"### 第 {summary.get('batch', '?')} 批（{summary.get('record_count', 0)} 条）", "", str(summary.get('summary') or '未生成摘要。'), ""])
+                verification = summary.get("verification") or {}
+                if verification:
+                    lines.append(f"- 原文匹配状态：{verification.get('status')}；通过 {verification.get('accepted', 0)} 条，未通过 {verification.get('rejected', 0)} 条。")
+                for citation in summary.get("citations") or []:
+                    lines.extend([f"- 来源编号：{citation['source_id']}", f"  - 原文摘录：{citation['quote']}", f"  - 原始链接：{citation.get('source_url') or '未提供'}"])
+                if verification:
+                    lines.extend(["", "原文匹配仅说明摘录可追溯，不代表来源事实已核实。", ""])
         content = _frontmatter({"type": "analysis-report", "source_category": run["source_category"], "platform": run["platform"], "source_file": run["source_file"], "created": run["created_at"][:10], "tags": ["ai-security", "analysis-report", "auto-generated"]}) + "\n".join(lines) + "\n"
         written += int(_write_note(reports_root / topic_dir / filename, content))
     return {"status": "completed", "vault": str(vault), "notes_written": written, "documents": len(docs), "evidence": len(evidence), "comments": len(comments), "analysis_reports": len(analysis_runs)}

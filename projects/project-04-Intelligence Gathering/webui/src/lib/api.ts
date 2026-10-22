@@ -53,6 +53,16 @@ export interface FilePreviewResponse {
   columns?: string[]
 }
 
+export interface SourceCheckedBatch {
+  batch: number
+  record_count: number
+  summary?: string
+  topics?: string[]
+  claims?: string[]
+  citations?: { source_id: string; source_url: string; quote: string; text: string; trust: string }[]
+  verification?: { status: 'source-matched' | 'rejected' | 'model-error'; accepted: number; rejected: number; error_type?: string }
+}
+
 export interface AnalysisResult {
   output_file: string
   input_count: number
@@ -60,7 +70,7 @@ export interface AnalysisResult {
   scope_excluded?: number
   ai_enabled: boolean
   batch_size?: number
-  batch_summaries?: { batch: number; record_count: number; summary?: string; topics?: string[] }[]
+  batch_summaries?: SourceCheckedBatch[]
   intelligence?: {
     topics: { topic: string; content_count: number; platforms: Record<string, number>; representative_terms: string[]; recent_count: number; trend: string; evidence_count: number; quality_score: number }[]
     research_directions: { research_direction: string; score: number; topic: string; why_now: string; research_questions: string[]; recommended_methods: string[]; evidence_topics: string[] }[]
