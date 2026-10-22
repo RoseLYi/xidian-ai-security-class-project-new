@@ -15,7 +15,7 @@
 
 ## 个人研究项目
 
-本 Fork 另收录个人的[多智能体系统安全研究项目](projects/multi-agent-security-research/README.md)，内容包括文献库、阅读笔记、威胁建模、协作安全评测框架与实验记录模板。项目完整保存在 `projects/multi-agent-security-research/` 文件夹中；来源及导入版本见[整合说明](projects/multi-agent-security-research/SOURCE.md)。当前内容为研究资料与文本框架，尚未在原项目中完成复现实验。
+本 Fork 另收录个人的[多智能体系统安全研究项目](projects/multi-agent-security-research/README.md)，内容包括文献库、阅读笔记、威胁建模与协作安全评测框架。项目完整保存在 `projects/multi-agent-security-research/` 文件夹中；来源及导入版本见[整合说明](projects/multi-agent-security-research/SOURCE.md)。已新增项目 04 的[三角色来源追踪实验及报告](projects/multi-agent-security-research/experiments/source_tracking/REPORT.md)，完成 240 次真实运行；本次自建原型不代表目录中 25 篇论文已完成复现。
 
 ## 目录结构
 

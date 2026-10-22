@@ -1,0 +1,11 @@
+{
+  "collected_at_utc": "2026-10-22T07:29:56.876779+00:00",
+  "endpoint": "https://api.github.com/repos/Sicherheit-in-Multiagentensystemen/multi-agent-security-research/git/blobs/c95baa6c7391ad9a6601dca0a5e3b9f20966d487",
+  "revision": "462267451ad935166d8e1b2aad5c2abb8ccbad28",
+  "blob_sha1": "c95baa6c7391ad9a6601dca0a5e3b9f20966d487",
+  "corpus_sha256": "7aa7b7033503d9c836637835d0d5a9f8787e35e70b2661c06c90aa909e1766bc",
+  "count": 22,
+  "selection": "first 22 catalog entries, original order",
+  "topic": "multi-agent systems security",
+  "material_type": "public curated metadata, not full papers"
+}

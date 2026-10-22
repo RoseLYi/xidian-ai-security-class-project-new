@@ -19,6 +19,7 @@
 | 审计合作团队中的串谋 | [Colosseum 审计框架](frameworks/COLOSSEUM_AUDIT.md) · [专用实验模板](templates/COLLUSION_AUDIT.md) |
 | 开展规范的文献整理 | [文献综述流程](frameworks/LITERATURE_REVIEW.md) · [本次检索记录](docs/SEARCH_LOG.md) |
 | 设计可比较的安全实验 | [评测框架](frameworks/EVALUATION.md) |
+| 运行项目 04 的三角色来源追踪原型 | [实验与复现命令](experiments/source_tracking/README.md) · [真实运行报告](experiments/source_tracking/REPORT.md) |
 | 形成研究问题与近期计划 | [研究路线图](docs/ROADMAP.md) · [阅读路线](docs/READING_PATH.md) |
 | 找安全指南、协议与开源基准 | [资料与工具](resources/README.md) |
 | 新增论文或实验记录 | [贡献说明](CONTRIBUTING.md) · [模板目录](templates/README.md) |
@@ -51,6 +52,9 @@ resources/     指南、协议和开源基准
 frameworks/    研究范围、分类、文献整理、威胁建模与评测文本
 templates/     阅读卡片、威胁模型、实验记录、周报与综述提纲
 docs/          阅读路线、研究计划与检索记录
+experiments/   课程自建原型、实际运行汇总及局限说明
 ```
 
 论文与外部代码遵循各自版权和许可证。本仓库保存链接、引用及原创整理文本，不镜像第三方论文全文。后续更新通过提交记录追踪；目前未设置自动收集任务。
+
+2026-10-22 新增项目 04 的自建实验：240 次真实三角色运行，完成来源核验、管线归档和网页演示。两组固定攻击成功数均为 0，尚无防御降低攻击成功率的证据；正常任务完成率由 100% 降至 95%。这不改变上述 25 篇论文“未复现”的状态，详见[实验报告](experiments/source_tracking/REPORT.md)。

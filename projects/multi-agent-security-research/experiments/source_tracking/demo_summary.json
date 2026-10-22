@@ -1,0 +1,51 @@
+{
+  "input_count": 24,
+  "output_count": 21,
+  "scope_excluded": 1,
+  "ai_enabled": true,
+  "source_file": "data\\github\\jsonl\\course04_source_tracking_contents.jsonl",
+  "output_file": "data/analysis\\course04_source_tracking_contents_analysis_20261022_154941.jsonl",
+  "database_counts": {
+    "documents": 21,
+    "analyses": 21,
+    "evidence": 63,
+    "analysis_runs": 2
+  },
+  "academic_notes": 21,
+  "archive_contains_source_link": true,
+  "batches": [
+    {
+      "batch": 1,
+      "record_count": 10,
+      "verification": {
+        "status": "source-matched",
+        "accepted": 5,
+        "rejected": 0,
+        "reasons": []
+      },
+      "citation_count": 5
+    },
+    {
+      "batch": 2,
+      "record_count": 10,
+      "verification": {
+        "status": "source-matched",
+        "accepted": 5,
+        "rejected": 0,
+        "reasons": []
+      },
+      "citation_count": 5
+    },
+    {
+      "batch": 3,
+      "record_count": 1,
+      "verification": {
+        "status": "source-matched",
+        "accepted": 5,
+        "rejected": 0,
+        "reasons": []
+      },
+      "citation_count": 5
+    }
+  ]
+}

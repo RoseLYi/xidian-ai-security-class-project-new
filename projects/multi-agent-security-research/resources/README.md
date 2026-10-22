@@ -25,4 +25,4 @@
 | [HPTSA](https://github.com/uiuc-kang-lab/HPTSA) | P24 | 分析团队规划与安全任务能力 | 安全应用资料，与保护 MAS 的防御证据分开存放 |
 | [Colosseum](https://github.com/umass-ai-safety/colosseum) | P25 | 联合审计串谋对话与实际联盟行动 | 记录论文 v2 与代码提交，区分原始/归一化指标；配套[审计框架](../frameworks/COLOSSEUM_AUDIT.md) |
 
-本组织当前没有运行上述项目，也没有已完成的安全实验。实验状态以[文献目录](../papers/catalog.json)和后续实验记录为准。
+本组织当前没有运行上述外部项目。课程 Fork 已新增[自建三角色来源追踪实验](../experiments/source_tracking/REPORT.md)，不属于上述基准或论文的复现。各论文复现状态仍以[文献目录](../papers/catalog.json)为准。
